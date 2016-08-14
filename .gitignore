@@ -1,0 +1,6 @@
+.idea/
+dynamodb-local/
+
+project/project
+project/target
+target

@@ -1,0 +1,36 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/styles.css">
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.0.js"></script>
+
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.7.2/mustache.min.js"></script>
+    <script id="dudeTmpl" type="text/template">
+        <div>bit1: {{bit1}}, byte2: {{byte2}}</div>
+    </script>
+
+    <script type="text/javascript">
+    $(document).ready(function() {
+        $.getJSON(
+            "/get-it/1",
+            function (dude) {
+                var dudeTemplate = $("#dudeTmpl").html();
+                var dudeHtml = Mustache.to_html(dudeTemplate, dude);
+                $('#dudesArea').append(dudeHtml);
+            }
+        );
+    });
+    </script>
+</head>
+<body>
+
+<h1>dudes</h1>
+<div id="dudesArea"></div>
+
+
+</body>
+</html>
