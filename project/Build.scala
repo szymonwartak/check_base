@@ -1,30 +1,28 @@
 import sbt.Keys._
 import sbt._
-import com.localytics.sbt.dynamodb.DynamoDBLocalKeys._
 import spray.revolver.RevolverKeys
 
 object BabylonBuild extends Build with RevolverKeys {
 
   val akkaV = "2.3.3"
   val sprayV = "1.3.2"
+  val luceneV = "6.1.0"
 
-  val dynamoDbSettings = Seq(
-    startDynamoDBLocal <<= startDynamoDBLocal.dependsOn(compile in Test),
-    test in Test <<= (test in Test).dependsOn(startDynamoDBLocal),
-    testOptions in Test <+= dynamoDBLocalTestCleanup
-  )
   val coreSettings = Seq(
     parallelExecution in Test := false,
-    name := "rest_dynamodb_mustachejs",
+    name := "check_base",
     version := "1.0",
     scalaVersion := "2.11.8",
     javaOptions in reStart += "-Xmx2g",
-    mainClass in reStart := Some("com.archetype.rest_dynamodb.RestApi"),
+    mainClass in reStart := Some("com.babylonhealth.check_base.RestApi"),
     resolvers ++= Seq(
       Resolver.mavenLocal
     ),
     libraryDependencies ++= Seq(
-      "com.github.seratch" %% "awscala" % "0.3.+",
+      "org.apache.lucene" % "lucene-core" % luceneV,
+      "org.apache.lucene" % "lucene-analyzers-common" % luceneV,
+      "org.apache.lucene" % "lucene-queryparser" % luceneV,
+      "org.apache.lucene" % "lucene-memory" % luceneV,
       "com.google.code.gson" % "gson" % "2.7",
       "com.typesafe.akka" %% "akka-remote" % akkaV,
       "com.typesafe.akka" %% "akka-testkit" % akkaV,
@@ -39,8 +37,8 @@ object BabylonBuild extends Build with RevolverKeys {
     )
   )
 
-  lazy val root = Project("rest_dynamodb", file(".")).settings(
-    coreSettings ++ dynamoDbSettings: _*
+  lazy val root = Project("check_base", file(".")).settings(
+    coreSettings : _*
   )
 
 }

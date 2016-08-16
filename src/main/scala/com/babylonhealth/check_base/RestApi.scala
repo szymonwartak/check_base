@@ -1,4 +1,4 @@
-package com.archetype.rest_dynamodb
+package com.babylonhealth.check_base
 
 import akka.actor.ActorSystem
 import akka.util.Timeout
@@ -9,11 +9,9 @@ import spray.json.{DefaultJsonProtocol, RootJsonFormat}
 import spray.routing.{HttpService, SimpleRoutingApp}
 
 import scala.concurrent.duration._
+import collection.JavaConversions._
 
-/**
- * Created by szymon.wartak on 14/08/2016.
- */
-// request param classes
+// request param classes and deserialisation implicits
 case class Params2(p1: Int, p2: String)
 
 object JsonDeser extends DefaultJsonProtocol {
@@ -21,7 +19,7 @@ object JsonDeser extends DefaultJsonProtocol {
 }
 
 object RestApi extends SimpleRoutingApp with Routing with App {
-  //with SSLConfiguration {
+
   implicit val system = ActorSystem("restapi")
   implicit val timeout = Timeout(5 seconds)
 
@@ -31,6 +29,8 @@ object RestApi extends SimpleRoutingApp with Routing with App {
 trait Routing extends HttpService with MetaToResponseMarshallers {
 
   import JsonDeser._
+
+  val doit = new BusinessLogic
 
   lazy val routes = {
     pathPrefix("css") {
@@ -44,24 +44,24 @@ trait Routing extends HttpService with MetaToResponseMarshallers {
         }
       } ~
       path("") {
-        getFromResource("webapp/index.html")
+        getFromResource("webapp/ca_index.html")
       } ~
       path("do-it") {
         post {
           entity(as[Params2]) { du =>
             detach() {
               complete {
-                businessLogic.doIt(du)
                 "ok"
               }
             }
           }
         }
       } ~
-      path("get-it" / IntNumber) { id =>
+      path("search" / RestPath) { query =>
         get {
           complete {
-            gson.toJson(businessLogic.get(id))
+            val props = UserProps("en", "male")
+            gson.toJson(doit.search(props)(query.toString))
           }
         }
       }

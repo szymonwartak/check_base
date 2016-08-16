@@ -1,0 +1,71 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/styles.css">
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.0.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.3.3/backbone-min.js"></script>
+
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.7.2/mustache.min.js"></script>
+    <script id="questionTmpl" type="text/template">
+    <% _.each(array, function(kn){ %>
+        <div><%= kn.question.text %></div>
+        <ul>
+        <% _.each(kn.answers, function(answer){ %>
+            <li><%= answer.text %></li>
+        <% }); %>
+        </ul>
+    <% }); %>
+    </script>
+
+    <script type="text/javascript">
+    $(document).ready(function() {
+        var answer = Backbone.Model.extend({})
+        var answers = Backbone.Collection.extend({})
+        var question = Backbone.Model.extend({})
+        var nodes = Backbone.Collection.extend({
+            url: '/search/cough',
+            parse: function(data) {
+                var template = _.template($( "script#questionTmpl" ).html());
+                $('#searchArea').append(template(data));
+            }
+        });
+        $('#search').keypress(function(e) {
+            if (e.which == '13') {
+                var term = $(this).val()
+                $.getJSON(
+                    "/search/"+term,
+                    function (data) {
+                        var template = _.template($( "script#questionTmpl" ).html());
+                        $('#searchArea').append(template(data));
+                        //var searchTemplate = $("#searchTmpl").html();
+                        //var searchHtml = Mustache.to_html(searchTemplate, res);
+                        //$('#searchArea').append(searchHtml);
+                    }
+                );
+            }
+        });
+        $('.question').click(function() {
+        });
+    });
+    </script>
+</head>
+<body>
+
+Check Authoring
+
+<div id="flowArea"></div>
+
+<br/>
+<input type="text" placeholder="find nodes" id="search">
+
+<div id="searchArea"></div>
+
+
+
+</body>
+</html>
